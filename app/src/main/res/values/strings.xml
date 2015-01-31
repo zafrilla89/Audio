@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Audio</string>
+    <string name="grabadoradesonido">GRABADORA DE SONIDO</string>
+    <string name="reproductordeaudio">REPRODUCTOR DE AUDIO</string>
+    <string name="title_activity_grabador">Grabadora de sonido</string>
+    <string name="title_activity_reproductor">Reproductor de musica</string>
+    <string name="title_activity_cantantes">Reproductor de musica</string>
+    <string name="cantantes">Cantantes</string>
+    <string name="title_activity_discos">Reproductor de musica</string>
+    <string name="title_activity_canciones">Reproductor de musica</string>
+    <string name="anterior">ANTERIOR</string>
+    <string name="siguiente">SIGUIENTE</string>
+    <string name="play">PLAY</string>
+    <string name="pause">PAUSE</string>
+    <string name="stop">STOP</string>
+    <string name="guardar">GUARDAR</string>
+
+</resources>
