@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -35,6 +36,7 @@ public class Reproductor extends Activity {
             }
         }
     };
+    private ImageButton btnr, btr1, btrt, bta, btna;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,13 @@ public class Reproductor extends Activity {
         pl=(Button)findViewById(R.id.pl);
         pa=(Button)findViewById(R.id.pa);
         st=(Button)findViewById(R.id.st);
+        btnr=(ImageButton)findViewById(R.id.btnr);
+        btr1=(ImageButton)findViewById(R.id.btr1);
+        btrt=(ImageButton)findViewById(R.id.btrt);
+        btnr.setEnabled(false);
+        bta=(ImageButton)findViewById(R.id.bta);
+        btna=(ImageButton)findViewById(R.id.btna);
+        btna.setEnabled(false);
         pl.setEnabled(false);
         canciones = getIntent().getStringArrayListExtra("nombres");
         rutas = getIntent().getStringArrayListExtra("rutas");
@@ -52,6 +61,8 @@ public class Reproductor extends Activity {
         intent = new Intent(this, Audio.class);
         intent.putExtra("canciones", rutas);
         intent.putExtra("contador", cont);
+        intent.putExtra("repeticion","no");
+        intent.putExtra("aleatoria","no");
         intent.setAction(Audio.ADD);
         startService(intent);
         intent.setAction(Audio.PLAY);
@@ -117,6 +128,44 @@ public class Reproductor extends Activity {
         startService(intent);
         intent.setAction(Audio.PLAY);
         startService(intent);
+    }
+
+    public void norepetir(View view){
+        intent.setAction(Audio.NOREPETIR);
+        startService(intent);
+        btnr.setEnabled(false);
+        btrt.setEnabled(true);
+        btr1.setEnabled(true);
+    }
+
+    public void repetir1(View view){
+        intent.setAction(Audio.REPETIR1);
+        startService(intent);
+        btnr.setEnabled(true);
+        btrt.setEnabled(true);
+        btr1.setEnabled(false);
+    }
+
+    public void repetirtoras(View view){
+        intent.setAction(Audio.REPETIRTODAS);
+        startService(intent);
+        btnr.setEnabled(true);
+        btrt.setEnabled(false);
+        btr1.setEnabled(true);
+    }
+
+    public void noaleatorio(View view){
+        intent.setAction(Audio.NOALEATORIA);
+        startService(intent);
+        btna.setEnabled(false);
+        bta.setEnabled(true);
+    }
+
+    public void aleatorio(View view){
+        intent.setAction(Audio.ALEATORIA);
+        startService(intent);
+        btna.setEnabled(true);
+        bta.setEnabled(false);
     }
 
 }

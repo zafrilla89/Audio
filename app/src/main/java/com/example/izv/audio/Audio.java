@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Audio extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener{
 
@@ -32,7 +33,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         error
     };
     private ArrayList<String> canciones;
-    private int cont;
+    private int cont, conta;
     private Estados estado;
     public static final String PLAY="play";
     public static final String PAUSE="pause";
@@ -40,9 +41,15 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     public static final String ADD="add";
     public static final String SIGUIENTE="siguiente";
     public static final String ANTERIOR="anterior";
+    public static final String NOREPETIR="no repetir";
+    public static final String REPETIR1="repetir 1";
+    public static final String REPETIRTODAS="repetir todas";
+    public static final String NOALEATORIA="no aleatoria";
+    public static final String ALEATORIA="aleatoria";
     public final static String MENSAJE ="datos";
     private Uri cancion=null;
     private boolean reproducir;
+    private String repeticion, aleatoria;
     /**********************************************************************************************/
     // CONSTRUCTOR //
     /**********************************************************************************************/
@@ -67,6 +74,8 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
             if(action.equals(ADD)){
                 canciones=intent.getExtras().getStringArrayList("canciones");
                 cont=intent.getIntExtra("contador", -1);
+                repeticion=intent.getExtras().getString("repeticion");
+                aleatoria=intent.getExtras().getString("aleatoria");
                 add(canciones.get(cont));
                 Log.v("AAAAAAAAAAAAAAAAAAAAAA","ENTRA EN ADD");
             }else{
@@ -81,6 +90,29 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                         }else {
                             if (action.equals(ANTERIOR)){
                                 anterior();
+                            }else{
+                                if (action.equals(NOREPETIR)){
+                                    this.repeticion="no";
+                                    this.conta=0;
+                                }else{
+                                    if (action.equals(REPETIR1)){
+                                        this.repeticion="1";
+                                    }else{
+                                        if (action.equals(REPETIRTODAS)){
+                                            this.repeticion="todas";
+                                        }else {
+                                            if (action.equals(NOALEATORIA)) {
+                                                this.aleatoria = "no";
+                                            } else {
+
+                                                if (action.equals(ALEATORIA)) {
+                                                    this.aleatoria = "si";
+                                                    this.conta=0;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -139,14 +171,29 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     public void onCompletion(MediaPlayer mp) {
         estado=Estados.completed;
         Log.v("AAAAAAAAAAA", "COMPLETADO");
-        if ((cont+1)!=canciones.size()) {
-            siguiente();
-            Intent in = new Intent(MENSAJE);
-            in.putExtra("contador", cont);
-            sendBroadcast(in);
-            play();
-        }
-
+            if (repeticion.compareTo("no") == 0) {
+                if (aleatoria.compareTo("no")==0) {
+                    if ((cont + 1) != canciones.size()) {
+                        siguiente();
+                        play();
+                    }
+                }else{
+                    if ((conta + 1) != canciones.size()) {
+                        siguiente();
+                        play();
+                        conta=conta+1;
+                    }
+                }
+            } else {
+                if (repeticion.compareTo("1") == 0) {
+                    play();
+                } else {
+                    if (repeticion.compareTo("todas") == 0) {
+                        siguiente();
+                        play();
+                    }
+                }
+            }
     }
 
     /**********************************************************************************************/
@@ -236,10 +283,18 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     }
 
     private void siguiente(){
-        cont=cont+1;
-        if (cont==canciones.size()){
-            cont=0;
+        if (aleatoria.compareTo("no")==0) {
+            cont=cont+1;
+            if (cont == canciones.size()) {
+                cont = 0;
+            }
+        }else{
+            Random rnd = new Random();
+            cont=rnd.nextInt(canciones.size());
         }
+        Intent in = new Intent(MENSAJE);
+        in.putExtra("contador", cont);
+        sendBroadcast(in);
         add(canciones.get(cont));
     }
 
@@ -248,6 +303,9 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         if (cont<0){
             cont=canciones.size()-1;
         }
+        Intent in = new Intent(MENSAJE);
+        in.putExtra("contador", cont);
+        sendBroadcast(in);
         add(canciones.get(cont));
     }
 

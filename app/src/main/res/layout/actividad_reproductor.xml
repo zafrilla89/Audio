@@ -4,7 +4,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.izv.android.grabadorreproductordeaudio.Reproductor">
+    tools:context="com.izv.android.grabadorreproductordeaudio.Reproductor"
+    android:background="#1f12ff4c">
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,7 +24,9 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/tvreproductor"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -101,6 +104,67 @@
                     android:layout_marginRight="10dp"
                     android:onClick="siguiente" />
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="10dp">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnr"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:onClick="norepetir" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btr1"
+                    android:src="@drawable/ic_action_replay"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:onClick="repetir1" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btrt"
+                    android:src="@drawable/ic_action_repeat"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:onClick="repetirtoras" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btna"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:onClick="noaleatorio" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/bta"
+                android:src="@drawable/ic_action_shuffle"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:onClick="aleatorio" />
         </LinearLayout>
 
         <Button
@@ -110,7 +174,8 @@
             android:id="@+id/button4"
             android:onClick="pararservicio"
             android:layout_toRightOf="@+id/st"
-            android:layout_alignTop="@+id/barra" />
+            android:layout_alignTop="@+id/barra"
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 

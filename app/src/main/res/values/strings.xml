@@ -16,5 +16,6 @@
     <string name="pause">PAUSE</string>
     <string name="stop">STOP</string>
     <string name="guardar">GUARDAR</string>
+    <string name="repeticion">REPETICION:</string>
 
 </resources>
