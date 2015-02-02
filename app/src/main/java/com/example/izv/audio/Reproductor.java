@@ -105,11 +105,16 @@ public class Reproductor extends Activity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onDestroy() {
         unregisterReceiver(contador);
         unregisterReceiver(duracion);
         unregisterReceiver(segundo);
+        super.onDestroy();
     }
 
     public void play(View view){

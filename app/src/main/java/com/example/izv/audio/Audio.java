@@ -58,6 +58,8 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     private Uri cancion=null;
     private boolean reproducir;
     private String repeticion, aleatoria;
+    private boolean pause=false;
+
     /**********************************************************************************************/
     // CONSTRUCTOR //
     /**********************************************************************************************/
@@ -74,52 +76,51 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-        Log.v("AAAAAAAAAAAAAAAAAAAAAA","ENTRA EN onStartCommand");
-        if (action.equals(PLAY)){
-            play();
-        }else{
-            if(action.equals(ADD)){
-                canciones=intent.getExtras().getStringArrayList("canciones");
-                cont=intent.getIntExtra("contador", -1);
-                repeticion=intent.getExtras().getString("repeticion");
-                aleatoria=intent.getExtras().getString("aleatoria");
-                add(canciones.get(cont));
-                Log.v("AAAAAAAAAAAAAAAAAAAAAA","ENTRA EN ADD");
+            String action = intent.getAction();
+            if (action.equals(PLAY)){
+                play();
             }else{
-                if (action.equals(STOP)){
-                    stop();
-                }else{
-                    if (action.equals(PAUSE)){
-                        pause();
-                    }else{
-                        if (action.equals(SIGUIENTE)){
-                            siguiente();
-                        }else {
-                            if (action.equals(ANTERIOR)){
-                                anterior();
-                            }else{
-                                if (action.equals(NOREPETIR)){
-                                    this.repeticion="no";
-                                    this.conta=0;
-                                }else{
-                                    if (action.equals(REPETIR1)){
-                                        this.repeticion="1";
-                                    }else{
-                                        if (action.equals(REPETIRTODAS)){
-                                            this.repeticion="todas";
-                                        }else {
-                                            if (action.equals(NOALEATORIA)) {
-                                                this.aleatoria = "no";
+                if(action.equals(ADD)){
+                    canciones=intent.getExtras().getStringArrayList("canciones");
+                    cont=intent.getIntExtra("contador", -1);
+                    repeticion=intent.getExtras().getString("repeticion");
+                    aleatoria=intent.getExtras().getString("aleatoria");
+                    add(canciones.get(cont));
+                }else {
+                    if (action.equals(STOP)) {
+                        stop();
+                    } else {
+                        if (action.equals(PAUSE)) {
+                            pause();
+                        } else {
+                            if (action.equals(SIGUIENTE)) {
+                                siguiente();
+                            } else {
+                                if (action.equals(ANTERIOR)) {
+                                    anterior();
+                                } else {
+                                    if (action.equals(NOREPETIR)) {
+                                        this.repeticion = "no";
+                                        this.conta = 0;
+                                    } else {
+                                        if (action.equals(REPETIR1)) {
+                                            this.repeticion = "1";
+                                        } else {
+                                            if (action.equals(REPETIRTODAS)) {
+                                                this.repeticion = "todas";
                                             } else {
-                                                if (action.equals(ALEATORIA)) {
-                                                    this.aleatoria = "si";
-                                                    this.conta=0;
-                                                }else{
-                                                    if (action.equals(MOVERBARRA)) {
-                                                        milisegundo=intent.getIntExtra("milisegundo", -1);
-                                                        mp.seekTo(milisegundo);
+                                                if (action.equals(NOALEATORIA)) {
+                                                    this.aleatoria = "no";
+                                                } else {
+                                                    if (action.equals(ALEATORIA)) {
+                                                        this.aleatoria = "si";
+                                                        this.conta = 0;
+                                                    } else {
+                                                        if (action.equals(MOVERBARRA)) {
+                                                            milisegundo = intent.getIntExtra("milisegundo", -1);
+                                                            mp.seekTo(milisegundo);
 
+                                                        }
                                                     }
                                                 }
                                             }
@@ -130,9 +131,9 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                         }
                     }
                 }
-            }
+
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -290,13 +291,10 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         this.cancion=uri;
         estado= Estados.idle;
         mp.reset();
-        Log.v("cancion",uri.getPath());
     }
 
     private void pause(){
-        Log.v("entra en pause","AAAA");
         if(estado==Estados.started){
-            Log.v("entra en pause en el if","AAAA");
             mp.pause();
             estado=Estados.paused;
             pause=true;
@@ -304,6 +302,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     }
 
     private void siguiente(){
+        milisegundo=mp.getDuration();
         if (aleatoria.compareTo("no")==0) {
             cont=cont+1;
             if (cont == canciones.size()) {
@@ -320,6 +319,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     }
 
     private void anterior(){
+        milisegundo=mp.getDuration();
         cont=cont-1;
         if (cont<0){
             cont=canciones.size()-1;
@@ -330,7 +330,9 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         add(canciones.get(cont));
     }
 
-    private boolean pause=false;
+    /**********************************************************************************************/
+    // CLASE ASYNTASK //
+    /**********************************************************************************************/
 
     class AvanceDeCancion extends AsyncTask<Void, Integer, Void> {
 
@@ -338,7 +340,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         protected Void doInBackground(Void... params) {
             for (milisegundo=0;milisegundo<mp.getDuration();milisegundo=milisegundo+1000){
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1 );
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

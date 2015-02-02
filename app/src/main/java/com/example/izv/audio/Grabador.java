@@ -31,6 +31,7 @@ public class Grabador extends Activity {
     private String nombre="";
     private Button btguardar,btborrar;
     private ImageButton btgrabar,btparar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +50,21 @@ public class Grabador extends Activity {
         }else{
             carpeta.mkdir();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        File archivo = new File(Environment.getExternalStoragePublicDirectory("Grabador") + "/"+nombre+".mp3");
+        archivo.delete();
+        Uri uri =MediaStore.Audio.Media.EXTERNAL_CONTENT_URI; ;
+        String condicion = "title=?";
+        String[] parametros = {"t"};
+        getContentResolver().delete(
+                uri,
+                condicion,
+                parametros);
+        finish();
+        super.onDestroy();
     }
 
     public void grabar(View view){
