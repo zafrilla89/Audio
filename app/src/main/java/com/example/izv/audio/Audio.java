@@ -1,11 +1,15 @@
 package com.example.izv.audio;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
@@ -33,7 +37,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         error
     };
     private ArrayList<String> canciones;
-    private int cont, conta;
+    private int cont, conta, milisegundo=1000;
     private Estados estado;
     public static final String PLAY="play";
     public static final String PAUSE="pause";
@@ -46,7 +50,11 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     public static final String REPETIRTODAS="repetir todas";
     public static final String NOALEATORIA="no aleatoria";
     public static final String ALEATORIA="aleatoria";
-    public final static String MENSAJE ="datos";
+    public static final String MOVERBARRA="mover barra";
+    public final static String CONTADOR ="contador";
+    public final static String DURACION ="duracion";
+    public final static String BARRASEGUNDO ="barrasegundo";
+    private AvanceDeCancion adc;
     private Uri cancion=null;
     private boolean reproducir;
     private String repeticion, aleatoria;
@@ -104,10 +112,15 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                                             if (action.equals(NOALEATORIA)) {
                                                 this.aleatoria = "no";
                                             } else {
-
                                                 if (action.equals(ALEATORIA)) {
                                                     this.aleatoria = "si";
                                                     this.conta=0;
+                                                }else{
+                                                    if (action.equals(MOVERBARRA)) {
+                                                        milisegundo=intent.getIntExtra("milisegundo", -1);
+                                                        mp.seekTo(milisegundo);
+
+                                                    }
                                                 }
                                             }
                                         }
@@ -145,6 +158,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         // mp.reset();
         mp.release();
         mp=null;
+        adc.cancel(true);
         super.onDestroy();
     }
 
@@ -157,9 +171,14 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     public void onPrepared(MediaPlayer mp) {
         estado=Estados.prepared;
         if (reproducir) {
-            Log.v("entra","true");
             mp.start();
             estado=Estados.started;
+            Intent in = new Intent(DURACION);
+            in.putExtra("duracion", mp.getDuration());
+            sendBroadcast(in);
+            milisegundo=1000;
+            adc=new AvanceDeCancion();
+            adc.execute();
         }
     }
 
@@ -170,7 +189,6 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     @Override
     public void onCompletion(MediaPlayer mp) {
         estado=Estados.completed;
-        Log.v("AAAAAAAAAAA", "COMPLETADO");
             if (repeticion.compareTo("no") == 0) {
                 if (aleatoria.compareTo("no")==0) {
                     if ((cont + 1) != canciones.size()) {
@@ -246,6 +264,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                     reproducir=true;
                 }
                 if (estado==Estados.prepared || estado==Estados.paused || estado==Estados.completed){
+                    pause=false;
                     mp.start();
                     estado=Estados.started;
                 }
@@ -261,6 +280,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
             mp.seekTo(0);
             mp.stop();
             estado=Estados.stoped;
+            adc.cancel(true);
         }reproducir=false;
     }
 
@@ -279,6 +299,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
             Log.v("entra en pause en el if","AAAA");
             mp.pause();
             estado=Estados.paused;
+            pause=true;
         }
     }
 
@@ -292,7 +313,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
             Random rnd = new Random();
             cont=rnd.nextInt(canciones.size());
         }
-        Intent in = new Intent(MENSAJE);
+        Intent in = new Intent(CONTADOR);
         in.putExtra("contador", cont);
         sendBroadcast(in);
         add(canciones.get(cont));
@@ -303,10 +324,54 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         if (cont<0){
             cont=canciones.size()-1;
         }
-        Intent in = new Intent(MENSAJE);
+        Intent in = new Intent(CONTADOR);
         in.putExtra("contador", cont);
         sendBroadcast(in);
         add(canciones.get(cont));
+    }
+
+    private boolean pause=false;
+
+    class AvanceDeCancion extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (milisegundo=0;milisegundo<mp.getDuration();milisegundo=milisegundo+1000){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                milisegundo=mp.getCurrentPosition();
+                    if (this.isCancelled()){
+                        return null;
+                    }
+                    while (pause==true){
+
+                    }
+
+                publishProgress(milisegundo);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Intent in=new Intent(BARRASEGUNDO);
+            in.putExtra("segundo", values[values.length - 1]);
+            sendBroadcast(in);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
     }
 
 }

@@ -10,32 +10,49 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class Reproductor extends Activity {
 
     private ArrayList<String> canciones, rutas;
-    private int cont;
+    private int cont, dur;
     private TextView tv;
     private Intent intent;
     private Button pl, pa, st;
-    private BroadcastReceiver receptor = new BroadcastReceiver() {
+    private SeekBar barra;
+    private BroadcastReceiver contador = new BroadcastReceiver() {
+           @Override
+           public void onReceive(Context context, Intent intent) {
+               Bundle bundle = intent.getExtras();
+               if (bundle != null) {
+                   cont = bundle.getInt("contador");
+                   tv.setText(canciones.get(cont));
+               }}};
+    private BroadcastReceiver duracion = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
-            Log.v("AAAAAAAAAAAAAAAAAAAA","entra en broadcast");
             if (bundle != null) {
-                cont = bundle.getInt("contador");
-                tv.setText(canciones.get(cont));
-            }
-        }
-    };
+                dur = bundle.getInt("duracion");
+                barra.setMax(dur);
+                Log.v("eeeeeeeeeeee", dur + "");
+            }}};
+    private BroadcastReceiver segundo = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                int seg = bundle.getInt("segundo");
+               barra.setProgress(seg);
+            }}};
     private ImageButton btnr, btr1, btrt, bta, btna;
 
     @Override
@@ -52,6 +69,7 @@ public class Reproductor extends Activity {
         bta=(ImageButton)findViewById(R.id.bta);
         btna=(ImageButton)findViewById(R.id.btna);
         btna.setEnabled(false);
+        barra=(SeekBar)findViewById(R.id.barra);
         pl.setEnabled(false);
         canciones = getIntent().getStringArrayListExtra("nombres");
         rutas = getIntent().getStringArrayListExtra("rutas");
@@ -67,8 +85,31 @@ public class Reproductor extends Activity {
         startService(intent);
         intent.setAction(Audio.PLAY);
         startService(intent);
-        registerReceiver(receptor, new IntentFilter(Audio.MENSAJE));
-        unregisterReceiver(receptor);
+        registerReceiver(contador, new IntentFilter(Audio.CONTADOR));
+        registerReceiver(duracion, new IntentFilter(Audio.DURACION));
+        registerReceiver(segundo, new IntentFilter(Audio.BARRASEGUNDO));
+        barra.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    intent.setAction(Audio.MOVERBARRA);
+                    intent.putExtra("milisegundo",barra.getProgress());
+                    startService(intent);
+                    return false;
+                }
+                return false;
+            }
+        });
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(contador);
+        unregisterReceiver(duracion);
+        unregisterReceiver(segundo);
     }
 
     public void play(View view){
@@ -97,18 +138,13 @@ public class Reproductor extends Activity {
 
     public void pararservicio(View view){
         stopService(intent);
-        finish();
+        System.exit(0);
     }
 
     public void anterior(View view){
         pl.setEnabled(false);
         pa.setEnabled(true);
         st.setEnabled(true);
-        cont=cont-1;
-        if (cont<0){
-            cont=canciones.size()-1;
-        }
-        tv.setText(canciones.get(cont));
         intent.setAction(Audio.ANTERIOR);
         startService(intent);
         intent.setAction(Audio.PLAY);
@@ -119,11 +155,6 @@ public class Reproductor extends Activity {
         pl.setEnabled(false);
         pa.setEnabled(true);
         st.setEnabled(true);
-        cont=cont+1;
-        if (cont==canciones.size()){
-            cont=0;
-        }
-        tv.setText(canciones.get(cont));
         intent.setAction(Audio.SIGUIENTE);
         startService(intent);
         intent.setAction(Audio.PLAY);
