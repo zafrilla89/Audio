@@ -54,6 +54,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     public final static String CONTADOR ="contador";
     public final static String DURACION ="duracion";
     public final static String BARRASEGUNDO ="barrasegundo";
+    public final static String COMPLETADA ="completada";
     private AvanceDeCancion adc;
     private Uri cancion=null;
     private boolean reproducir;
@@ -195,12 +196,18 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                     if ((cont + 1) != canciones.size()) {
                         siguiente();
                         play();
+                    }else {
+                        Intent in = new Intent(COMPLETADA);
+                        sendBroadcast(in);
                     }
                 }else{
                     if ((conta + 1) != canciones.size()) {
                         siguiente();
                         play();
                         conta=conta+1;
+                    }else {
+                        Intent in = new Intent(COMPLETADA);
+                        sendBroadcast(in);
                     }
                 }
             } else {
@@ -249,7 +256,6 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
             }
             if (estado==Estados.idle){
                 try {
-                    // mp.setDataSource(rutaCancion);
                     mp.setDataSource(this,cancion);
                     estado=Estados.initialized;
                 } catch (IOException e) {
@@ -264,13 +270,20 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                 if (estado==Estados.preparing){
                     reproducir=true;
                 }
-                if (estado==Estados.prepared || estado==Estados.paused || estado==Estados.completed){
+                if (estado==Estados.prepared || estado==Estados.paused ){
                     pause=false;
                     mp.start();
                     estado=Estados.started;
                 }
+                if (estado==Estados.completed) {
+                    pause = false;
+                    milisegundo = 1000;
+                    mp.start();
+                    adc = new AvanceDeCancion();
+                    adc.execute();
+                    estado=Estados.started;
+                }
                 if(estado==Estados.started){
-                    //mp.seekTo(0); para volver a empezar
                 }
             }
         }
@@ -302,7 +315,6 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
     }
 
     private void siguiente(){
-        milisegundo=mp.getDuration();
         if (aleatoria.compareTo("no")==0) {
             cont=cont+1;
             if (cont == canciones.size()) {
@@ -315,11 +327,11 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         Intent in = new Intent(CONTADOR);
         in.putExtra("contador", cont);
         sendBroadcast(in);
+        stop();
         add(canciones.get(cont));
     }
 
     private void anterior(){
-        milisegundo=mp.getDuration();
         cont=cont-1;
         if (cont<0){
             cont=canciones.size()-1;
@@ -327,6 +339,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         Intent in = new Intent(CONTADOR);
         in.putExtra("contador", cont);
         sendBroadcast(in);
+        stop();
         add(canciones.get(cont));
     }
 
@@ -338,13 +351,12 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
 
         @Override
         protected Void doInBackground(Void... params) {
-            for (milisegundo=0;milisegundo<mp.getDuration();milisegundo=milisegundo+1000){
+            for (milisegundo=1000;milisegundo<mp.getDuration();milisegundo=milisegundo+1000){
                 try {
-                    Thread.sleep(1 );
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                milisegundo=mp.getCurrentPosition();
                     if (this.isCancelled()){
                         return null;
                     }

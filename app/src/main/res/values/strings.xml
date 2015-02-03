@@ -17,5 +17,6 @@
     <string name="stop">STOP</string>
     <string name="guardar">GUARDAR</string>
     <string name="repeticion">REPETICION:</string>
+    <string name="cerrar">CERRAR</string>
 
 </resources>

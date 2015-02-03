@@ -54,16 +54,10 @@ public class Grabador extends Activity {
 
     @Override
     protected void onDestroy() {
-        File archivo = new File(Environment.getExternalStoragePublicDirectory("Grabador") + "/"+nombre+".mp3");
-        archivo.delete();
-        Uri uri =MediaStore.Audio.Media.EXTERNAL_CONTENT_URI; ;
-        String condicion = "title=?";
-        String[] parametros = {"t"};
-        getContentResolver().delete(
-                uri,
-                condicion,
-                parametros);
-        finish();
+        if (guardar==false) {
+            File archivo = new File(Environment.getExternalStoragePublicDirectory("Grabador") + "/" + nombre + ".mp3");
+            archivo.delete();
+        }
         super.onDestroy();
     }
 
@@ -81,6 +75,7 @@ public class Grabador extends Activity {
         try {
             grabador.prepare();
             grabador.start();
+            tv.setText("GRABANDO...");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,13 +107,6 @@ public class Grabador extends Activity {
     public void borrar(View view){
             File archivo = new File(Environment.getExternalStoragePublicDirectory("Grabador") + "/"+nombre+".mp3");
             archivo.delete();
-            Uri uri =MediaStore.Audio.Media.EXTERNAL_CONTENT_URI; ;
-            String condicion = "title=?";
-            String[] parametros = {"t"};
-            getContentResolver().delete(
-                    uri,
-                    condicion,
-                    parametros);
         finish();
     }
 
