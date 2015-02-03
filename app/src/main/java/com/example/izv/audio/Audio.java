@@ -37,7 +37,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
         error
     };
     private ArrayList<String> canciones;
-    private int cont, conta, milisegundo=1000;
+    private int cont, conta, milisegundo=500;
     private Estados estado;
     public static final String PLAY="play";
     public static final String PAUSE="pause";
@@ -178,7 +178,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
             Intent in = new Intent(DURACION);
             in.putExtra("duracion", mp.getDuration());
             sendBroadcast(in);
-            milisegundo=1000;
+            milisegundo=500;
             adc=new AvanceDeCancion();
             adc.execute();
         }
@@ -277,7 +277,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                 }
                 if (estado==Estados.completed) {
                     pause = false;
-                    milisegundo = 1000;
+                    milisegundo = 500;
                     mp.start();
                     adc = new AvanceDeCancion();
                     adc.execute();
@@ -351,9 +351,9 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
 
         @Override
         protected Void doInBackground(Void... params) {
-            for (milisegundo=1000;milisegundo<mp.getDuration();milisegundo=milisegundo+1000){
+            for (milisegundo=500;milisegundo<mp.getDuration();milisegundo=milisegundo+500){
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
