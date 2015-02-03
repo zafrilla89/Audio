@@ -29,16 +29,7 @@ public class Cantantes extends Activity {
         ListView lv=(ListView)findViewById(R.id.lvcantantes);
         ArrayList<String> artistasrepetidos= new ArrayList<String>();
         Uri ur= MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] proyeccion = null;
-        String condicion = null;
-        String[] parametros = null;
-        String orden = null;
-        Cursor cursor=getContentResolver().query(
-                ur,
-                proyeccion,
-                condicion,
-                parametros,
-                orden);
+        Cursor cursor=getContentResolver().query(ur, null, null, null, null);
         cursor.moveToFirst();
         artistas= new ArrayList<String>();
         while (!cursor.isAfterLast()) {

@@ -36,16 +36,9 @@ public class Discos extends Activity {
             cantante="<unknown>";
         }
         Uri ur= MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] proyeccion = null;
         String condicion = "artist=?";
         String[] parametros = new String[]{cantante};
-        String orden = null;
-        Cursor cursor=getContentResolver().query(
-                ur,
-                proyeccion,
-                condicion,
-                parametros,
-                orden);
+        Cursor cursor=getContentResolver().query(ur, null, condicion, parametros, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             int numc=cursor.getColumnIndex("album");

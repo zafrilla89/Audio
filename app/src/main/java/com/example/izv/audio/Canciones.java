@@ -33,16 +33,10 @@ public class Canciones extends Activity {
         String disco = getIntent().getExtras().getString("disco");
         tv.setText("Canciones del disco "+disco);
         Uri ur= MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] proyeccion = null;
         String condicion = "artist=? AND album=?";
         String[] parametros = new String[]{cantante,disco};
         String orden = "track";
-        Cursor cursor=getContentResolver().query(
-                ur,
-                proyeccion,
-                condicion,
-                parametros,
-                orden);
+        Cursor cursor=getContentResolver().query(ur, null, condicion, parametros, orden);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             int numc=cursor.getColumnIndex("title");

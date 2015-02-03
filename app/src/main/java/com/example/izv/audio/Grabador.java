@@ -63,7 +63,8 @@ public class Grabador extends Activity {
 
     public void grabar(View view){
         Date d=new Date();
-        nombre=(d.getYear() + 1900) + "_" + (d.getMonth() + 1) + "_" + d.getDate() + "_" + d.getHours() + "_" + d.getMinutes() + "_" + d.getSeconds();
+        nombre=(d.getYear() + 1900) + "_" + (d.getMonth() + 1) + "_" + d.getDate() +
+                "_" + d.getHours() + "_" + d.getMinutes() + "_" + d.getSeconds();
         grabador.setAudioSource(
                 MediaRecorder.AudioSource.MIC);
         grabador.setOutputFormat(

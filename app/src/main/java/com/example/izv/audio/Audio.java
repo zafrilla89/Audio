@@ -132,7 +132,6 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                         }
                     }
                 }
-
         }
         return START_REDELIVER_INTENT;
     }
@@ -283,8 +282,6 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                     adc.execute();
                     estado=Estados.started;
                 }
-                if(estado==Estados.started){
-                }
             }
         }
     }
@@ -360,10 +357,7 @@ public class Audio extends Service implements MediaPlayer.OnPreparedListener, Me
                     if (this.isCancelled()){
                         return null;
                     }
-                    while (pause==true){
-
-                    }
-
+                    while (pause==true){}
                 publishProgress(milisegundo);
             }
             return null;

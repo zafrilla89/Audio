@@ -43,7 +43,6 @@
             android:name="com.example.izv.audio.Canciones"
             android:label="@string/title_activity_canciones" >
         </activity>
-
         <service
             android:name="com.example.izv.audio.Audio"
             android:enabled="true"
